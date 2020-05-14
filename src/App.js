@@ -1,26 +1,24 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Container, CssBaseline, withStyles } from '@material-ui/core';
+import VideoList from './containers/VideoList';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import useStyles from './styles/useStyles';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+class App extends React.Component {
+  render(){
+    return (
+      <div className={this.props.classes.root}>
+        <CssBaseline />
+        <Header />
+        <Container maxWidth={false} className={this.props.classes.main}>
+          <VideoList />
+        </Container>
+        <Footer/>
+      </div>
+    );
+  };
 }
 
-export default App;
+export default withStyles(useStyles)(App);
