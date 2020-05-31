@@ -1,6 +1,7 @@
-# Fifty Tube
+# Fifty Tube (in TypeScript)
 ## Overview
 Fifty Tube will enable you to search top 50 Youtube videos that are related to the words you input.
+This is the TypeScript version of the original Fifty-Tube.
 
 
 ## Sample Image

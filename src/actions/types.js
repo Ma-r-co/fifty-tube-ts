@@ -1,3 +1,0 @@
-export const START_REQUEST = 'START_REQUEST';
-export const RECEIVE_DATA = 'RECEIVE_DATA';
-export const FINISH_REQUEST = 'FINISH_REQUEST';

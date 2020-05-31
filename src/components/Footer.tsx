@@ -1,12 +1,11 @@
-import React from 'react';
+import * as React from 'react';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import Link from '@material-ui/core/Link';
-import { makeStyles } from '@material-ui/core';
 import useStyles from '../styles/useStyles';
 
 
-function Copyright() {
+const Copyright: React.FC = () => {
   return (
     <Typography variant="body2" color="textSecondary">
       {'Copyright © '}
@@ -20,16 +19,18 @@ function Copyright() {
 }
 
 
-export default function StickyFooter() {
-  const classes = makeStyles(useStyles)();
+const StickyFooter: React.FC = () => {
+  const classes = useStyles();
 
   return (
     <footer className={classes.footer}>
       <Container maxWidth="sm">
         <Typography variant="body1">Thanks for dropping by this site.</Typography>
-        <Typography variant="body2" color="textSecondary">Last update: 14 May 2020</Typography>
+        <Typography variant="body2" color="textSecondary">Last update: 31 May 2020</Typography>
         <Copyright />
       </Container>
     </footer>
   );
 }
+
+export default StickyFooter;

@@ -1,13 +1,13 @@
-import {START_REQUEST, RECEIVE_DATA} from '../actions/types';
+import { Actions } from '../actions';
+import { VideoListState, RECEIVE_DATA, START_REQUEST } from './types';
 
-
-const initialState = {
+export const initialState = (injects?: VideoListState): VideoListState => ({
   queryWord: undefined,
   videos: undefined,
   error: false
-};
+});
 
-export default (state=initialState, action) => {
+export const reducer = (state=initialState(), action: Actions) => {
   switch (action.type) {
     case START_REQUEST:
       return {
@@ -18,7 +18,7 @@ export default (state=initialState, action) => {
     case RECEIVE_DATA:
       return action.payload.error
         ? {...state, error: true }
-        : {...state, ...action.payload}
+        : {...state, videos:action.payload.response}
     default:
       return state
   }

@@ -1,54 +1,76 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 import clsx from 'clsx';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles, WithStyles, createStyles, Theme } from '@material-ui/core/styles';
 import TableCell from '@material-ui/core/TableCell';
 import Paper from '@material-ui/core/Paper';
-import { AutoSizer, Column, Table } from 'react-virtualized';
+import { AutoSizer, Column, Table, TableCellRenderer, TableHeaderProps } from 'react-virtualized';
 import { connect } from 'react-redux';
+import { Videos, Video } from '../store/videoList/types';
+import { RootState } from '../store/setupStore';
 
-
-const styles = (theme) => ({
-  flexContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    boxSizing: 'border-box',
-  },
-  table: {
-    // temporary right-to-left patch, waiting for
-    // https://github.com/bvaughn/react-virtualized/issues/454
-    '& .ReactVirtualized__Table__headerRow': {
-      flip: false,
-      paddingRight: theme.direction === 'rtl' ? '0px !important' : undefined,
+const styles = (theme: Theme) => 
+  createStyles({
+    flexContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      boxSizing: 'border-box',
     },
-  },
-  tableRow: {
-    cursor: 'pointer',
-  },
-  tableRowHover: {
-    '&:hover': {
-      backgroundColor: theme.palette.grey[200],
+    table: {
+      // temporary right-to-left patch, waiting for
+      // https://github.com/bvaughn/react-virtualized/issues/454
+      '& .ReactVirtualized__Table__headerRow': {
+        flip: false,
+        paddingRight: theme.direction === 'rtl' ? '0px !important' : undefined,
+      },
     },
-  },
-  tableCell: {
-    flex: 1,
-  },
-  noClick: {
-    cursor: 'initial',
-  },
-  header: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText
-  },
-});
+    tableRow: {
+      cursor: 'pointer',
+    },
+    tableRowHover: {
+      '&:hover': {
+        backgroundColor: theme.palette.grey[200],
+      },
+    },
+    tableCell: {
+      flex: 1,
+    },
+    noClick: {
+      cursor: 'initial',
+    },
+    header: {
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.primary.contrastText
+    },
+  });
 
-class MuiVirtualizedTable extends React.PureComponent {
+interface ColumnData {
+  dataKey: string;
+  label: string;
+  numeric?: boolean;
+  width: number;
+}
+
+interface Row {
+  index: number;
+}
+
+interface MuiVirtualizedTableProps extends WithStyles<typeof styles> {
+  columns: ColumnData[];
+  headerHeight?: number;
+  onRowClick?: () => void;
+  rowCount: number;
+  rowGetter: (row: Row) => Video;
+  rowHeight?: number;
+}
+
+class MuiVirtualizedTable extends React.PureComponent<MuiVirtualizedTableProps> {
   static defaultProps = {
     headerHeight: 48,
     rowHeight: 48,
+    rowCount: 0,
   };
 
-  getRowClassName = ({ index }) => {
+  getRowClassName = ({ index }: Row) => {
     const { classes, onRowClick } = this.props;
 
     return clsx(classes.tableRow, classes.flexContainer, {
@@ -56,7 +78,7 @@ class MuiVirtualizedTable extends React.PureComponent {
     });
   };
 
-  cellRenderer = ({ cellData, columnIndex }) => {
+  cellRenderer: TableCellRenderer = ({ cellData, columnIndex }) => {
     const { columns, classes, rowHeight, onRowClick } = this.props;
     return (
       <TableCell
@@ -73,13 +95,13 @@ class MuiVirtualizedTable extends React.PureComponent {
     );
   };
 
-  headerRenderer = ({ label, columnIndex }) => {
+  headerRenderer = ({ label, columnIndex }: TableHeaderProps & { columnIndex: number }) => {
     const { headerHeight, columns, classes } = this.props;
 
     return (
       <TableCell
         component="div"
-        className={clsx(classes.tableCell, classes.flexContainer, classes.noClick, classes.header)}
+        className={clsx(classes.tableCell, classes.flexContainer, classes.noClick)}
         variant="head"
         style={{ height: headerHeight }}
         align={columns[columnIndex].numeric || false ? 'right' : 'left'}
@@ -97,11 +119,11 @@ class MuiVirtualizedTable extends React.PureComponent {
           <Table
             height={height}
             width={width}
-            rowHeight={rowHeight}
+            rowHeight={rowHeight!}
             gridStyle={{
               direction: 'inherit',
             }}
-            headerHeight={headerHeight}
+            headerHeight={headerHeight!}
             className={classes.table}
             {...tableProps}
             rowClassName={this.getRowClassName}
@@ -130,22 +152,34 @@ class MuiVirtualizedTable extends React.PureComponent {
   }
 }
 
-MuiVirtualizedTable.propTypes = {
-  classes: PropTypes.object.isRequired,
-  columns: PropTypes.arrayOf(
-    PropTypes.shape({
-      dataKey: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
-      numeric: PropTypes.bool,
-      width: PropTypes.number.isRequired,
-    }),
-  ).isRequired,
-  headerHeight: PropTypes.number,
-  onRowClick: PropTypes.func,
-  rowHeight: PropTypes.number,
-};
+// MuiVirtualizedTable.propTypes = {
+//   classes: PropTypes.object.isRequired,
+//   columns: PropTypes.arrayOf(
+//     PropTypes.shape({
+//       dataKey: PropTypes.string.isRequired,
+//       label: PropTypes.string.isRequired,
+//       numeric: PropTypes.bool,
+//       width: PropTypes.number.isRequired,
+//     }),
+//   ).isRequired,
+//   headerHeight: PropTypes.number,
+//   onRowClick: PropTypes.func,
+//   rowHeight: PropTypes.number,
+// };
 
 const VirtualizedTable = withStyles(styles)(MuiVirtualizedTable);
+
+// interface Data {
+//   id: string;
+//   title: string;
+//   duration: string;
+//   publishedAt: string;
+//   viewCount: number;
+//   likeCount: number;
+//   dislikeCount: number;
+//   favoriteCount: number;
+//   commentCount: number;
+// }
 
 // ---
 
@@ -163,9 +197,13 @@ const VirtualizedTable = withStyles(styles)(MuiVirtualizedTable);
 
 // const rows = [];
 
+interface ReactVirtualizedTableProps {
+  videos: Videos | undefined;
+}
 
-function ReactVirtualizedTable({videos}) {
-  let rows = videos || [];
+const ReactVirtualizedTable: React.FC<ReactVirtualizedTableProps> = ({videos=[]}) => {
+  let rows = videos;
+
   return (
     <Paper style={{ height: 400, width: '100%' }}>
       <VirtualizedTable
@@ -228,10 +266,10 @@ function ReactVirtualizedTable({videos}) {
   );
 }
 
-function mapStateToProps (state) {
+function mapState (state: RootState) {
   return {
     videos: state.videoList.videos
   };
 }
 
-export default connect(mapStateToProps)(ReactVirtualizedTable);
+export default connect(mapState)(ReactVirtualizedTable);

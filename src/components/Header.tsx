@@ -1,10 +1,10 @@
-import React from 'react';
-import { AppBar, Toolbar, Typography, makeStyles } from '@material-ui/core';
+import * as React from 'react';
+import { AppBar, Toolbar, Typography } from '@material-ui/core';
 import useStyles from '../styles/useStyles';
 
 
-export default function header () {
-  const classes = makeStyles(useStyles)();
+const Header: React.FC = () => {
+  const classes = useStyles();
 
   return (
     <AppBar className={classes.header} position="static">
@@ -16,3 +16,5 @@ export default function header () {
     </AppBar>
   );
 };
+
+export default Header;
